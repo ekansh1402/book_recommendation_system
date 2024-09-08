@@ -129,7 +129,7 @@
                             <strong>Summary: </strong><br>
                             <img id="loading" src="{% static 'mainapp/gif/loading.gif' %}">
                             <p id="booksummary">
-
+                                
                             </p>
                             <strong>Authors:</strong>
                             <p id="bookauthors">
@@ -200,9 +200,13 @@
                 success: function(response) {
                     $('#loading').hide();
                     $('#booksummary').text(response['booksummary']);
+                    // console.log("hi");
+                    //return response['booksummary']; 
+
                 },
                 error: function(response) {
-                    console.log(response)
+                    console.log(response);
+                    //return 'summary not found';
                 }
             })
         }
@@ -329,7 +333,7 @@
                 $('#rate-' + bookid).css('display', 'none');
                 $('#button-text-' + bookid).css('display', 'block');
                 $('#rating-block-' + bookid).css('transition', 'background-color 2s ease');
-                $('#rating-block-' + bookid).css('background-color', '#31c2cf');
+                $('#rating-block-' + bookid).css('background-color', '#17191D');
             }, 4000);
         }
 

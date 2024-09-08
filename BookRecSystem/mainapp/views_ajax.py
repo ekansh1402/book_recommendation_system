@@ -42,28 +42,31 @@ def search(request):
 
 def book_summary(request):
     """
-    AJAX request for book summary
+     AJAX request for book summary
     """
+
     if request.method == "POST" and is_ajax(request=request):
         bookid = request.POST.get("bookid", None)
+        
         if is_bookid_invalid(bookid):
             return JsonResponse({"success": False}, status=200)
-        URL = "https://www.goodreads.com/book/show/" + bookid
-        page = requests.get(URL)
-        soup = BeautifulSoup(page.content, "html.parser")
-        div_container = soup.find(id="description")
-        full_book_summary = ""
-        if not div_container:
-            return JsonResponse({"success": False}, status=200)
-        for spantag in div_container.find_all("span"):
-            try:
-                # When text is too long, consider till last complete sentence
-                full_book_summary += spantag.text[: spantag.text.rindex(".")] + ". "
-            except ValueError:
-                full_book_summary += spantag.text + " "
-            break
-        part_summary = " ".join(full_book_summary.split()[:65]) + " . . ."
+
+        df_book = pd.read_csv(book_path)
+        
+        # Filter the DataFrame by book_id
+        part_summary = df_book[df_book.book_id == int(bookid)]["desc"].values
+        
+        # Check if part_summary has any values
+        if part_summary.size > 0:
+            if len(part_summary[0])>100:
+                part_summary = str(part_summary[0])  # Extract the first value
+            else: 
+                part_summary="summary not found"
+        else:
+            part_summary="Summary not found"
+        
         return JsonResponse({"success": True, "booksummary": part_summary}, status=200)
+
 
 
 def get_book_details(request):

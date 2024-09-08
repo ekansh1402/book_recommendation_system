@@ -8,7 +8,8 @@ import random
 from collections import Counter
 import BookRecSystem.settings as settings
 import mainapp.models
-
+from collections import defaultdict
+from scipy.spatial.distance import cosine
 book_path = os.path.join(settings.STATICFILES_DIRS[0] + "/mainapp/dataset/books.csv")
 
 # For Count Vectorizer
@@ -312,7 +313,7 @@ def get_book_dict(bookid_list):
     return rec_books_dict
 
 
-def combine_ids(tfidf_bookids, embedding_bookids, already_rated, recommendations=9):
+def combine_ids(tfidf_bookids, embedding_bookids, already_rated,collaborative_bookids, recommendations=9):
     """Return best bookids combining both approaches.
 
         Embedding - Top 6
@@ -339,12 +340,15 @@ def combine_ids(tfidf_bookids, embedding_bookids, already_rated, recommendations
 
     """
     tfidf_bookids = list(tfidf_bookids.difference(already_rated))
+    collaborative_bookids = list(collaborative_bookids.difference(already_rated))
+    top_3_coll = set(collaborative_bookids[:3])
     top_3_tfidf = set(tfidf_bookids[:3])
     embedding_bookids = embedding_bookids.difference(already_rated)
     embedding_bookids = list(embedding_bookids.difference(top_3_tfidf))
+    top_3_coll = list(top_3_coll)
     top_3_tfidf = list(top_3_tfidf)
     top_6_embed = list(embedding_bookids[:6])
-    best_bookids = top_3_tfidf + top_6_embed
+    best_bookids = top_3_tfidf + top_6_embed + top_3_coll
 
     # If not enough recommendations
     if len(best_bookids) < recommendations:
@@ -466,3 +470,50 @@ def popular_among_users(N=15):
         )
 
     return get_book_dict(filtered_books)
+
+
+
+
+
+
+def get_book_recommendations(user_id,UserRating, top_n=5):
+   
+    
+    ratings_df = pd.DataFrame(list(UserRating.objects.all().values('user', 'bookid', 'bookrating')))
+    
+    if ratings_df.empty :
+        return []
+
+    
+    ratings_pivot = ratings_df.pivot(index='user', columns='bookid', values='bookrating').fillna(0)
+
+    
+    if user_id not in ratings_pivot.index:
+        return []
+
+    
+    user_similarity = ratings_pivot.apply(lambda row: 1 - cosine(ratings_pivot.loc[user_id], row), axis=1)
+
+    
+    similar_users = user_similarity.drop(user_id).sort_values(ascending=False)
+
+    
+    books_to_recommend = defaultdict(float)
+    user_ratings = ratings_pivot.loc[user_id]
+    
+    for similar_user in similar_users.index[:10]:  # Top 10 similar users
+        similar_user_ratings = ratings_pivot.loc[similar_user]
+        
+        # Get books rated by the similar user but not rated by the current user
+        unrated_books = similar_user_ratings[user_ratings == 0]
+        
+        for book, rating in unrated_books.items():
+            books_to_recommend[book] += rating * similar_users[similar_user]  # Weight by similarity
+
+    # Sort books by weighted ratings and return top N
+    recommended_books = sorted(books_to_recommend.items(), key=lambda x: x[1], reverse=True)[:top_n]
+
+    # Get book details from df_book
+ 
+
+    return  recommended_books

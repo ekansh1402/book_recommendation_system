@@ -2,7 +2,7 @@
 .topbook-head {
     font-family: "Lobster", cursive;
     font-size: 300%;
-    background-color: #d7722c;
+    /* background-color: #d7722c; */
     margin-top: 0px;
     color: rgb(243, 238, 238);
 }
@@ -17,7 +17,7 @@
     bottom: -35px;
     left: 35px;
     border-radius: 3px;
-    box-shadow: -2px 6px 19px 0px #7f818e;
+    /* box-shadow: -2px 6px 19px 0px #7f818e; */
     transition: 0.3s ease;
     width: 85%;
     height: 60%;
@@ -36,7 +36,8 @@
     transition: 0.5s;
     cursor: pointer;
     border-radius: 3px;
-    box-shadow: -2px 6px 19px 0px #7f818e;
+    box-shadow:  #17181C;
+    width: 300px;
 }
 
 .card-title {
@@ -90,32 +91,36 @@
     border-radius: 20px;
     position: absolute;
     bottom: 10px;
-    right: 10%;
+    right: 2%;
 }
 
 .more-details:hover {
     color: black;
     background: white;
-    border: 2px solid #3d348b;
-    text-shadow: 1px 1px 3px white;
+    border: 2px ; 
+     /* text-shadow: 1px 1px 3px black; */
 }
 
 .rating-block {
     display: inline-block;
     text-align: center;
-    background-color: black;
     color:white;
+    background-color: black;
     font-weight: 600;
     font-size: 11px;
     border-radius: 20px;
     position: absolute;
-    padding: 8px;
     bottom: 10px;
-    left: 10%;
+    left: 4%;
+    padding: 8px;
 }
 
+
 .rating-block:hover {
-    text-shadow: 0px 0px 6px rgba(255, 255, 255, 1);
+    /* text-shadow: 0px 0px 6px rgba(255, 255, 255, 1); */
+    color: black;
+    background-color: white;
+    border: 2px ;
     transition: all 0.4s ease 0s;
 }
 
@@ -130,6 +135,11 @@
 }
 
 .card-text {
+    font-family: "Rockwell", serif;
+    color: orange;
+    font-weight: bold;
+    font-size: 15px;
+    padding-bottom: 1px;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;

@@ -10,6 +10,7 @@ from mainapp.helpers import (
     embedding_recommendations,
     get_top_n,
     popular_among_users,
+    get_book_recommendations,
 )
 from mainapp.models import UserRating, SaveForLater
 from django.contrib import messages
@@ -90,9 +91,10 @@ def book_recommendations(request):
         )
         # Get Top 10 bookids based on embedding
         embedding_bookids = set(embedding_recommendations(best_user_ratings))
-
+        # ratings_df = list(UserRating.objects.all().values('user', 'bookid', 'bookrating'))
+        collaborative_bookids=set(get_book_recommendations(request.user.id,UserRating))
         best_bookids = combine_ids(
-            tfidf_bookids, embedding_bookids, already_rated_books
+            tfidf_bookids, embedding_bookids, already_rated_books,collaborative_bookids
         )
         all_books_dict = get_book_dict(best_bookids)
     else:
